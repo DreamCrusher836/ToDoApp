@@ -5,6 +5,12 @@
 // on the global process.env object
 // This MUST be the very first line — before anything else imports process.env
 // If you call this after other imports, those imports won't see the env variables
+//
+// On Vercel, there is no .env file (it's excluded from deployments on purpose,
+// since it usually contains secrets) — Vercel injects the variables you set in
+// the dashboard directly into process.env instead. dotenv.config() will just
+// find nothing to load in that case, which is expected and harmless: it does
+// NOT overwrite variables that are already set in process.env.
 require("dotenv").config();
 
 // ============================================================
@@ -42,10 +48,11 @@ const app = express();
 // ============================================================
 // DEFINE THE PORT
 // ============================================================
-// process.env.PORT checks if a PORT variable exists in the .env file
+// process.env.PORT checks if a PORT variable exists
 // If not found, we default to 3000
 // Using an environment variable for PORT is best practice for deployment
-// (Hosting services like Heroku/Render set their own PORT value)
+// (Vercel/Heroku/Render set their own PORT value; Vercel actually ignores this
+// entirely for serverless functions, but it's harmless to keep for local dev)
 const PORT = process.env.PORT || 3000;
 
 // ============================================================
@@ -88,35 +95,52 @@ app.use(express.static("public"));
 app.use("/todos", todoRoutes);
 
 // ============================================================
-// CONNECT TO MONGODB AND START THE SERVER
+// CONNECT TO MONGODB
 // ============================================================
-// We connect to MongoDB FIRST, and only start the server AFTER
-// a successful connection. This prevents the server from
-// accepting requests before the database is ready.
-
-// mongoose.connect() takes the connection string from our .env file
+// mongoose.connect() takes the connection string from our environment variables
 // It returns a Promise — something that will either succeed or fail
-// .then() runs when the connection succeeds
-// .catch() runs when the connection fails
+
+// Fail loudly and immediately if MONGO_URI is missing, instead of letting
+// mongoose throw the much less obvious "uri must be a string, got undefined"
+// error. This is almost always caused by:
+//   - the env var not being set in your hosting provider's dashboard
+//   - the env var being set for the wrong environment scope (e.g. only
+//     "Preview" when you're testing a "Production" deployment)
+//   - a typo in the variable name (MONGO_URI vs MONGODB_URI, etc.)
+if (!process.env.MONGO_URI) {
+  console.error(
+    "❌ MONGO_URI is undefined. Check that it is set in your environment " +
+      "(.env locally, or your hosting provider's environment variables " +
+      "dashboard for the correct environment scope — Production/Preview/Development)."
+  );
+  process.exit(1);
+}
 
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    // This block runs only if MongoDB connected successfully
     console.log("✅ Connected to MongoDB Atlas");
-
-    // app.listen() starts the server and begins accepting HTTP requests
-    // It takes the PORT number and a callback function
-    // The callback runs once the server is ready
-    app.listen(PORT, () => {
-      console.log(`🚀 Server is running at http://localhost:${PORT}`);
-    });
   })
   .catch((error) => {
-    // This block runs if MongoDB connection failed
     // Common reasons: wrong MONGO_URI, network issue, IP not whitelisted in Atlas
     console.error("❌ Failed to connect to MongoDB:", error.message);
-    // process.exit(1) stops Node.js entirely with an error code
-    // No point running the server if there's no database
-    process.exit(1);
   });
+
+// ============================================================
+// START THE SERVER / EXPORT THE APP
+// ============================================================
+// Vercel's serverless model does not run a long-lived server process —
+// it imports this file and calls the exported Express app as a request
+// handler for each incoming request. app.listen() is meaningless there
+// (it would try to bind a port that nothing connects to).
+//
+// So: only call app.listen() when we're NOT running on Vercel. Vercel sets
+// the VERCEL env var automatically on every deployment, so we can use that
+// to tell the two environments apart.
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server is running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
