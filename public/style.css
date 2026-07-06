@@ -1,0 +1,301 @@
+/* ============================================================
+   RESET & BASE STYLES
+   Reset removes inconsistent default styles between browsers
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box; /* Makes width/height include padding and border */
+  margin: 0;
+  padding: 0;
+}
+
+/* Body — sets the background and default font for the whole page */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh; /* Makes the gradient cover the full screen height */
+  padding: 40px 20px;
+  color: #333;
+}
+
+/* ============================================================
+   CONTAINER — the main white card that holds everything
+   ============================================================ */
+.container {
+  max-width: 640px;       /* Prevents the card from being too wide on large screens */
+  margin: 0 auto;          /* Centers the card horizontally */
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #718096;
+}
+
+/* ============================================================
+   INPUT SECTION — the row with the text box and Add button
+   ============================================================ */
+.input-section {
+  display: flex;           /* Puts the input and button side by side */
+  gap: 10px;               /* Space between the input and button */
+  margin-bottom: 16px;
+}
+
+.todo-input {
+  flex: 1;                 /* Takes up all available space (button stays fixed width) */
+  padding: 14px 18px;
+  font-size: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  outline: none;           /* Removes the default blue browser outline */
+  transition: border-color 0.2s ease; /* Smooth color change when focused */
+  color: #2d3748;
+}
+
+/* Style when the user clicks into the input (focused state) */
+.todo-input:focus {
+  border-color: #667eea;
+}
+
+/* ============================================================
+   BUTTONS — shared base style + specific variants
+   ============================================================ */
+.btn {
+  padding: 14px 22px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;          /* Shows a hand cursor on hover */
+  transition: all 0.2s ease;
+  white-space: nowrap;      /* Prevents button text from wrapping to two lines */
+}
+
+/* Add button — purple gradient to match the background */
+.btn-add {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.btn-add:hover {
+  transform: translateY(-2px); /* Lifts the button slightly on hover */
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-add:active {
+  transform: translateY(0); /* Pushes back down when clicked */
+}
+
+/* Edit button — subtle blue outline */
+.btn-edit {
+  background: transparent;
+  color: #4299e1;
+  border: 2px solid #4299e1;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  border-radius: 8px;
+}
+
+.btn-edit:hover {
+  background: #4299e1;
+  color: white;
+}
+
+/* Save button — shown during inline editing */
+.btn-save {
+  background: #48bb78;
+  color: white;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  border-radius: 8px;
+}
+
+.btn-save:hover {
+  background: #38a169;
+}
+
+/* Cancel button — shown during inline editing */
+.btn-cancel {
+  background: transparent;
+  color: #a0aec0;
+  border: 2px solid #e2e8f0;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  border-radius: 8px;
+}
+
+.btn-cancel:hover {
+  background: #f7fafc;
+}
+
+/* Delete button — red to signal danger */
+.btn-delete {
+  background: transparent;
+  color: #fc8181;
+  border: 2px solid #fc8181;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  border-radius: 8px;
+}
+
+.btn-delete:hover {
+  background: #fc8181;
+  color: white;
+}
+
+/* ============================================================
+   STATS BAR — shows total and completed count
+   ============================================================ */
+.stats-bar {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #718096;
+  margin-bottom: 20px;
+  padding: 0 4px;
+}
+
+/* ============================================================
+   TODO LIST — the container for all todo items
+   ============================================================ */
+.todo-list {
+  display: flex;
+  flex-direction: column; /* Stacks todo items vertically */
+  gap: 12px;              /* Space between each todo card */
+}
+
+/* ============================================================
+   INDIVIDUAL TODO ITEM CARD
+   ============================================================ */
+.todo-item {
+  background: #f7fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px 18px;
+  transition: all 0.2s ease;
+}
+
+.todo-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+/* When a todo is marked complete — visual distinction */
+.todo-item.completed {
+  background: #f0fff4;    /* Light green background */
+  border-color: #9ae6b4;
+  opacity: 0.8;
+}
+
+/* Top row: checkbox + text + action buttons */
+.todo-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Custom Checkbox */
+.todo-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #667eea; /* Colors the checkmark itself (modern browsers) */
+  flex-shrink: 0;         /* Prevents checkbox from shrinking */
+}
+
+/* The todo text */
+.todo-text {
+  flex: 1;               /* Takes up remaining space */
+  font-size: 1rem;
+  color: #2d3748;
+  word-break: break-word; /* Wraps long text gracefully */
+  line-height: 1.4;
+}
+
+/* Strike-through style when todo is completed */
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+  color: #a0aec0;
+}
+
+/* Action buttons row (edit, delete) */
+.todo-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0; /* Buttons don't shrink even if text is long */
+}
+
+/* Inline edit input — replaces the text span during editing */
+.edit-input {
+  flex: 1;
+  padding: 6px 12px;
+  font-size: 0.95rem;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  outline: none;
+  color: #2d3748;
+}
+
+/* Date row below the todo text */
+.todo-date {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #a0aec0;
+  padding-left: 32px; /* Aligns with text (checkbox width + gap) */
+}
+
+/* ============================================================
+   EMPTY STATE — shown when there are no todos
+   ============================================================ */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #a0aec0;
+  font-size: 1rem;
+  display: none; /* Hidden by default; shown by JavaScript when list is empty */
+}
+
+/* ============================================================
+   RESPONSIVE — adjust layout on small screens (phones)
+   ============================================================ */
+@media (max-width: 480px) {
+  .container {
+    padding: 24px 18px;
+    border-radius: 14px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  /* Stack input and button vertically on small screens */
+  .input-section {
+    flex-direction: column;
+  }
+
+  .btn-add {
+    width: 100%; /* Full-width button on mobile */
+  }
+
+  .todo-actions {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
