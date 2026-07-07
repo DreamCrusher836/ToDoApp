@@ -22,6 +22,16 @@ require("dotenv").config();
 // Without Express, you'd have to handle every HTTP request manually with raw Node.js
 const express = require("express");
 
+// Import Path
+// Node's built-in "path" module helps build reliable file paths
+// __dirname always points to the folder this file (server.js) is actually in,
+// no matter what the "current working directory" happens to be when the code runs.
+// This matters because on Vercel's serverless functions, the working directory
+// isn't guaranteed to be your project root the way it is when you run
+// `node server.js` locally — so a plain relative string like "public" can
+// silently fail to resolve, while path.join(__dirname, "public") always works.
+const path = require("path");
+
 // Import CORS
 // CORS = Cross-Origin Resource Sharing
 // Browsers block requests from one domain (e.g., localhost:5500) to another (localhost:3000)
@@ -76,12 +86,15 @@ app.use(cors());
 app.use(express.json());
 
 // Static Files Middleware
-// express.static("public") tells Express:
-// "Serve any files inside the /public folder as static files"
+// express.static() tells Express: "Serve any files inside this folder as static files"
 // When someone visits http://localhost:3000, they get public/index.html
 // When the browser requests style.css, it gets public/style.css automatically
 // This is how our HTML/CSS/JS frontend is delivered to the browser
-app.use(express.static("public"));
+//
+// Using path.join(__dirname, "public") instead of the bare string "public"
+// makes sure this resolves correctly both locally AND on Vercel's serverless
+// functions, where the working directory can differ from the project root.
+app.use(express.static(path.join(__dirname, "public")));
 
 // ============================================================
 // ROUTES
